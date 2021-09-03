@@ -80,34 +80,28 @@ def tobs():
         year_tobs_list = list(np.ravel(year_tobs))
         return jsonify(year_tobs_list)
 
-# Create Start Day Route
+
 @app.route("/api/v1.0/<start>")
-def start_day(start):
-        start_day = session.query(Measurement.date, func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
-                filter(Measurement.date >= start).\
-                group_by(Measurement.date).all()
-        session.close()
-        # Convert Into List
-        start_day_list = list(np.ravel(start_day))
-        return jsonify(start_day_list)
-
-# Create Start-End Day Route
 @app.route("/api/v1.0/<start>/<end>")
-def start_end_day(start, end):
-        start_end_day = session.query(Measurement.date, func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
-                filter(Measurement.date >= start).\
-                filter(Measurement.date <= end).\
-                group_by(Measurement.date).all()
-        session.close()
-        # Convert Into List
-        start_end_day_list = list(np.ravel(start_end_day))
-        # Return JSON List of Min Temp, Avg Temp and Max Temp for a Given Start-End Range
-        return jsonify(start_end_day_list)
+def stats(start=None, end=None):
+   """Return TMIN, TAVG, TMAX."""
+   # Select statement
+   sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
+   if not end:
+       # calculate TMIN, TAVG, TMAX for dates greater than start
+       results = session.query(*sel).\
+           filter(Measurement.date >= start).all()
+       # Unravel results into a 1D array and convert to a list
+       temps = list(np.ravel(results))
+       return jsonify(temps)
 
-
-
-
+# calculate TMIN, TAVG, TMAX with start and stop
+   results = session.query(*sel).\
+       filter(Measurement.date >= start).\
+       filter(Measurement.date <= end).all()
+   # Unravel results into a 1D array and convert to a list
+   temps = list(np.ravel(results))
+   return jsonify(temps=temps)
 if __name__ == '__main__':
-    app.run(debug=True)
-
+   app.run()
 
