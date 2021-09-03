@@ -69,16 +69,15 @@ def stations():
 # Create TOBs Route
 @app.route("/api/v1.0/tobs")
 def tobs():
-        # Query for the Dates and Temperature Observations from a Year from the Last Data Point
-        previous_year = dt.date(2017,8,23) - dt.timedelta(days=365)
-        # Design a Query to Retrieve the Last 12 Months of Precipitation Data Selecting Only the `date` and `prcp` Values
-        year_tobs = session.query(Measurement.date, Measurement.tobs).\
-                filter(Measurement.date >= previous_year).\
-                order_by(Measurement.date).all()
-        session.close()
-        # Convert Into List
-        year_tobs_list = list(np.ravel(year_tobs))
-        return jsonify(year_tobs_list)
+#Query the primary station for all tobs from the last year
+ prev_year = dt.date(2017,8,23) - dt.timedelta(days=365)
+ results = session.query(Measurement.tobs).\
+       filter(Measurement.station == 'USC00519281').\
+       filter(Measurement.date >= prev_year).all()
+   # Unravel results into a 1D array and convert to a list
+ temps = list(np.ravel(results))
+   # Return the results
+ return jsonify(temps=temps)
 
 
 @app.route("/api/v1.0/<start>")
@@ -103,5 +102,5 @@ def stats(start=None, end=None):
    temps = list(np.ravel(results))
    return jsonify(temps=temps)
 if __name__ == '__main__':
-   app.run()
+   app.run(debug=True)
 
