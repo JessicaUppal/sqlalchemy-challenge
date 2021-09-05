@@ -1,14 +1,12 @@
 # Import Flask
 from flask import Flask, jsonify
-
+#Import Dependancies
 import numpy as np
 import datetime as dt
-from datetime import date, datetime
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
-
 
 # Database Setup
 engine = create_engine("sqlite:///Resources/hawaii.sqlite")
@@ -61,8 +59,7 @@ def stations():
         # Return JSON List of Stations 
         all_stations = session.query(Station.station, Station.name).all()
         session.close()
-        # Convert Into List
-        
+        # Unravel results into a 1D array and convert to a list
         station_list=list(np.ravel(all_stations))
         return jsonify(station_list)
 
@@ -78,7 +75,6 @@ def tobs():
  temps = list(np.ravel(results))
    # Return the results
  return jsonify(temps=temps)
-
 
 @app.route("/api/v1.0/<start>")
 @app.route("/api/v1.0/<start>/<end>")
@@ -102,5 +98,8 @@ def stats(start=None, end=None):
    temps = list(np.ravel(results))
    return jsonify(temps=temps)
 if __name__ == '__main__':
-   app.run(debug=True)
+   app.run()
+
+
+
 
