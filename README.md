@@ -1,4 +1,4 @@
-# SQLAlchemy Homework - Surfs Up!
+# SQLAlchemy Climate Analysis 
 
 ![surfs-up.png](Images/surfs-up.png)
 
